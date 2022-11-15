@@ -1,6 +1,6 @@
-# bind-nacos-cfg
+# bind_nacos_cfg
 
-bind-nacos-cfg 是一个动态绑定配置工具包，实现nacos配置绑定。
+bind_nacos_cfg 是一个动态绑定配置工具包，实现nacos配置绑定。
 
 支持配置数据
 - json
