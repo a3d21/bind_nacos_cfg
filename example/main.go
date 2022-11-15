@@ -20,6 +20,10 @@ func main() {
 	// var GetConf = bind_nacos_cfg.MustBind(cli, dataID, group, StructConfig{})
 	// var GetConf = bind_nacos_cfg.MustBind(cli, dataID, group, map[string]string{})
 	// var GetConf = bind_nacos_cfg.MustBind(cli, dataID, group, []string{})
+	// 绑定并监听变更
+	// var GetConf = bind_nacos_cfg.MustBind(cli, dataID, group, &ConfigStruct{}, func(v *ConfigStruct) {
+	// 	 fmt.Println(v)
+	// })
 
 	c := GetConf() // 获取最新配置
 	c = GetConf()

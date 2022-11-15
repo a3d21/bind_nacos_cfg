@@ -16,13 +16,14 @@ import (
 // Supplier 获取最新配置
 type Supplier[T any] func() T
 
-func (sup Supplier[T]) Get() T {
-	return sup()
-}
+// Listener 监听配置变更, optional
+type Listener[T any] func(T)
+
+func (sup Supplier[T]) Get() T { return sup() }
 
 // MustBind panic when fail
-func MustBind[T any](cli config_client.IConfigClient, dataID, group string, typ T) Supplier[T] {
-	sup, err := Bind(cli, dataID, group, typ)
+func MustBind[T any](cli config_client.IConfigClient, dataID, group string, typ T, lis ...Listener[T]) Supplier[T] {
+	sup, err := Bind(cli, dataID, group, typ, lis...)
 	if err != nil {
 		panic(fmt.Errorf("bind cfg fail, err: %v", err))
 	}
@@ -30,7 +31,8 @@ func MustBind[T any](cli config_client.IConfigClient, dataID, group string, typ 
 }
 
 // Bind dynamic bind config with typ, return `Supplier[T]` getting the latest config
-func Bind[T any](cli config_client.IConfigClient, dataID, group string, typ T) (Supplier[T], error) {
+// lis  optional, listen config change
+func Bind[T any](cli config_client.IConfigClient, dataID, group string, typ T, lis ...Listener[T]) (Supplier[T], error) {
 	h := &Holder{
 		typ: reflect.TypeOf(typ),
 		v:   &atomic.Value{},
@@ -49,6 +51,11 @@ func Bind[T any](cli config_client.IConfigClient, dataID, group string, typ T) (
 		return nil, err
 	}
 
+	// lis
+	for _, li := range lis {
+		li(h.Get().(T))
+	}
+
 	err = cli.ListenConfig(vo.ConfigParam{
 		DataId: dataID,
 		Group:  group,
@@ -59,6 +66,9 @@ func Bind[T any](cli config_client.IConfigClient, dataID, group string, typ T) (
 			err2 := h.Refresh(data)
 			if err2 != nil {
 				log.Errorf("refresh fail, raw: %v err: %v", data, err2)
+			}
+			for _, li := range lis {
+				li(h.Get().(T))
 			}
 		},
 	})
