@@ -21,6 +21,40 @@ type Listener[T any] func(T)
 
 func (sup Supplier[T]) Get() T { return sup() }
 
+// MustLoad panic when fail
+func MustLoad[T any](cli config_client.IConfigClient, dataID, group string, typ T) T {
+	res, err := Load(cli, dataID, group, typ)
+	if err != nil {
+		panic(fmt.Errorf("load cfg fail, err: %v", err))
+	}
+	return res
+}
+
+// Load nacos config typed
+func Load[T any](cli config_client.IConfigClient, dataID, group string, typ T) (T, error) {
+	var empty T
+
+	h := &Holder{
+		typ: reflect.TypeOf(typ),
+		v:   &atomic.Value{},
+	}
+
+	raw, err := cli.GetConfig(vo.ConfigParam{
+		DataId: dataID,
+		Group:  group,
+	})
+	if err != nil {
+		return empty, err
+	}
+
+	err = h.Refresh(raw)
+	if err != nil {
+		return empty, err
+	}
+
+	return h.Get().(T), nil
+}
+
 // MustBind panic when fail
 func MustBind[T any](cli config_client.IConfigClient, dataID, group string, typ T, lis ...Listener[T]) Supplier[T] {
 	sup, err := Bind(cli, dataID, group, typ, lis...)
