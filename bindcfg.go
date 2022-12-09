@@ -100,6 +100,7 @@ func Bind[T any](cli config_client.IConfigClient, dataID, group string, typ T, l
 			err2 := h.Refresh(data)
 			if err2 != nil {
 				log.Errorf("refresh fail, raw: %v err: %v", data, err2)
+				return
 			}
 			for _, li := range lis {
 				li(h.Get().(T))
