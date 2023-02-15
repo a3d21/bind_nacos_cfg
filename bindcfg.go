@@ -9,7 +9,6 @@ import (
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )
 
@@ -99,7 +98,7 @@ func Bind[T any](cli config_client.IConfigClient, dataID, group string, typ T, l
 			}
 			err2 := h.Refresh(data)
 			if err2 != nil {
-				log.Errorf("refresh fail, raw: %v err: %v", data, err2)
+				defaultLogger.Errorf("refresh fail, raw: %v err: %v", data, err2)
 				return
 			}
 			for _, li := range lis {

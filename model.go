@@ -5,8 +5,6 @@ import (
 	"reflect"
 
 	"sync/atomic"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // Holder is a Dynamic Config Holder with `Refresh`
@@ -16,7 +14,6 @@ type Holder struct {
 }
 
 func (h *Holder) Refresh(raw string) error {
-	log.Infof("refresh config, raw: %v", raw)
 	if raw == "" {
 		return errors.New("empty raw")
 	}

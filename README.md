@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/a3d21/bind_nacos_cfg"
+	"github.com/sirupsen/logrus"
 )
 
 type ConfigStruct struct {
@@ -35,6 +36,7 @@ func main() {
 	var cli config_client.IConfigClient // TODO 初始化
 	dataID := "abc"
 	group := "def"
+	bind_nacos_cfg.SetLogger(logrus.New()) // use logrus logger
 	var GetConf = bind_nacos_cfg.MustBind(cli, dataID, group, &ConfigStruct{})
 	// 也支持原生结构类型
 	// var GetConf = bind_nacos_cfg.MustBind(cli, dataID, group, ConfigStruct{})
